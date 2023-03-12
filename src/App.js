@@ -1,25 +1,45 @@
-import logo from './logo.svg';
+
 import './App.css';
+import Cards from './components/Cards/Cards';
+import Chart from './components/Chart/Charts';
+import DatePicker from './components/DatePicker/DatePicker';
+import { fetchData } from './api';
+import styles from './App.module.css'
+import { useEffect, useState } from 'react';
+import image from './images/image.png';
 
 function App() {
+  const [summary,setSummary] = useState({});
+  const [error, setError] = useState(false);
+  const [selectedDate, setSelectedDate ] = useState(null);
+  
+  useEffect(() => {
+    const fetch = async() => {
+      const summaryData =  await fetchData();
+      if(summaryData === "error"){
+        setError(true);
+      }else{
+        setSummary(summaryData);
+      }
+    }
+
+    fetch();
+    
+  },[]);
+
+  const dateChangeHandler = (date) => {
+    setSelectedDate(date);
+  }
+
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className={styles.container}>
+      <img className={styles.image} src={image} alt="COVID-19" />
+      {!error && <Cards data={summary}/>}
+      <DatePicker dateChangeHandler={dateChangeHandler}/>
+      <Chart selectedDate={selectedDate}/>
     </div>
   );
 }
 
-export default App;
+export default App; 
